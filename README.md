@@ -1,2 +1,2 @@
 # go-auth
-simple, opinionated, cookie based jwt auth in golang for fiber
+simple wrapper over `jwt-go` for authentication flow 
