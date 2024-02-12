@@ -1,11 +1,8 @@
-// dauth provides a simple, flexible authentication mechanism
+// gauth provides a simple, flexible authentication mechanism
 // built around JWT (JSON Web Tokens) for Go applications. It supports
 // generating access and refresh tokens with customizable lifetimes and
 // secrets, validating tokens, and extracting claims.
-//
-// Example usage:
-// // put example code here
-package dauth
+package gauth
 
 import (
 	"fmt"
