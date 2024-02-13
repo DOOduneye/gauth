@@ -1,4 +1,4 @@
-module github.com/dooduneye/go-auth
+module github.com/dooduneye/gauth
 
 go 1.21.1
 
