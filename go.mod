@@ -1,5 +1,16 @@
 module github.com/dooduneye/gauth
 
-go 1.21.1
+go 1.21.6
+
+toolchain go1.22.0
 
 require github.com/golang-jwt/jwt v3.2.2+incompatible
+
+require (
+	github.com/awnumar/memcall v0.2.0 // indirect
+	github.com/awnumar/memguard v0.22.4 // indirect
+	github.com/garrettladley/mattress v0.2.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.0 // indirect
+	golang.org/x/crypto v0.16.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
+)
