@@ -1,162 +1,209 @@
-// gauth provides a simple, flexible authentication mechanism
-// built around JWT (JSON Web Tokens) for Go applications. It supports
-// generating access and refresh tokens with customizable lifetimes and
-// secrets, validating tokens, and extracting claims.
 package gauth
 
 import (
-	"fmt"
-	"time"
+	"errors"
 
+	m "github.com/garrettladley/mattress"
 	"github.com/golang-jwt/jwt"
 )
 
-// Auth configures and manages token generation and validation for
-// access and refresh tokens. It encapsulates configurations for both
-// token types, allowing for separate secrets and durations.
 type Auth struct {
-	accessConfig  TokenConfig // Configuration for access tokens
-	refreshConfig TokenConfig // Configuration for refresh tokens
+	AccessConfig  AccessTokenConfig
+	RefreshConfig RefreshTokenConfig
 }
 
-// TokenConfig defines the secret key and duration for a token type.
-// The secret key is used to sign the token, and the duration defines
-// how long the token is valid.
-type TokenConfig struct {
-	secret   string        // Secret key used for signing tokens
-	duration time.Duration // Token validity duration
+// AccessTokenConfig is a builder for configuring access token options.
+type AccessTokenConfig struct {
+	secretKey      *m.Secret[[]byte]
+	standardClaims jwt.StandardClaims
+	customClaims   map[string]interface{}
 }
 
-// Token wraps the jwt.Token to provide additional functionality
-// or customization specific to the dauth package if needed.
-type Token struct {
-	*jwt.Token
+// RefreshTokenConfig is a builder for configuring refresh token options.
+type RefreshTokenConfig struct {
+	secretKey      *m.Secret[[]byte]
+	standardClaims jwt.StandardClaims
+	customClaims   map[string]interface{}
 }
 
-// TokenType distinguishes between access and refresh tokens,
-// allowing for different handling and configuration.
-type TokenType string
-
-const (
-	tokenTypeAccess  TokenType = "access"  // Represents an access token
-	tokenTypeRefresh TokenType = "refresh" // Represents a refresh token
-)
-
-// NewAuth initializes a new Auth instance with optional configuration
-// options, such as token secrets and durations for access and refresh tokens.
-// This allows for flexible and dynamic configuration of the authentication mechanism.
-func NewAuth(options ...func(*Auth)) *Auth {
-	var auth Auth
-	for _, option := range options {
-		option(&auth)
-	}
-	return &auth
-}
-
-// WithAccessTokenConfig returns a configuration option for setting the
-// access token's secret and duration. This option can be passed to NewAuth
-// to configure the access token parameters.
-func WithAccessTokenConfig(secret string, duration time.Duration) func(*Auth) {
-	return func(a *Auth) {
-		a.accessConfig = TokenConfig{secret: secret, duration: duration}
-	}
-}
-
-// WithRefreshTokenConfig returns a configuration option for setting the
-// refresh token's secret and duration. This option can be passed to NewAuth
-// to configure the refresh token parameters.
-func WithRefreshTokenConfig(secret string, duration time.Duration) func(*Auth) {
-	return func(a *Auth) {
-		a.refreshConfig = TokenConfig{secret: secret, duration: duration}
-	}
-}
-
-// GenerateToken creates a token of the specified type (access or refresh)
-// with the given claims. It returns the signed token string or an error if
-// the token could not be generated.
-func (a *Auth) GenerateToken(claims jwt.Claims, tokenType TokenType) (*string, error) {
-	var tokenConfig TokenConfig
-	switch tokenType {
-	case tokenTypeAccess:
-		tokenConfig = a.accessConfig
-	case tokenTypeRefresh:
-		tokenConfig = a.refreshConfig
-	default:
-		return nil, fmt.Errorf("unknown token type")
+// NewAccessTokenConfigBuilder creates a new instance of AccessTokenConfig.
+func NewAccessTokenConfigBuilder(secretKey []byte) (*AccessTokenConfig, error) {
+	if secretKey == nil {
+		return nil, errors.New("secret key is required")
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(tokenConfig.secret))
+	secret, err := m.NewSecret(secretKey)
 	if err != nil {
 		return nil, err
 	}
-	return &tokenString, nil
+
+	return &AccessTokenConfig{
+		secretKey: secret,
+	}, nil
 }
 
-// GenerateTokenPair generates a pair of tokens (access and refresh) for the
-// provided claims. This is useful for sessions where both an access token and
-// a refresh token are required.
-func (a *Auth) GenerateTokenPair(accessClaims, refreshClaims jwt.Claims) (accessToken *string, refreshToken *string, err error) {
-	accessToken, err = a.GenerateToken(accessClaims, tokenTypeAccess)
-	if err != nil {
-		return nil, nil, err
+// NewRefreshTokenConfigBuilder creates a new instance of RefreshTokenConfig.
+func NewRefreshTokenConfigBuilder(secretKey []byte) (*RefreshTokenConfig, error) {
+	if secretKey == nil {
+		return nil, errors.New("secret key is required")
 	}
 
-	refreshToken, err = a.GenerateToken(refreshClaims, tokenTypeRefresh)
+	secret, err := m.NewSecret(secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return accessToken, refreshToken, nil
+	return &RefreshTokenConfig{
+		secretKey: secret,
+	}, nil
 }
 
-// ParseToken validates the token string and returns the parsed token if valid.
-// The token's signature is verified using the access token's secret.
-func (a *Auth) ParseToken(tokenString string) (*jwt.Token, error) {
+// WithStandardClaims sets the standard claims for the access token.
+func (b *AccessTokenConfig) WithStandardClaims(claims jwt.StandardClaims) *AccessTokenConfig {
+	b.standardClaims = claims
+	return b
+}
+
+// WithStandardClaims sets the standard claims for the refresh token.
+func (b *RefreshTokenConfig) WithStandardClaims(claims jwt.StandardClaims) *RefreshTokenConfig {
+	b.standardClaims = claims
+	return b
+}
+
+// WithCustomClaims sets the custom claims for the access token.
+func (b *AccessTokenConfig) WithCustomClaims(claims map[string]interface{}) *AccessTokenConfig {
+	b.customClaims = claims
+	return b
+}
+
+// WithCustomClaims sets the custom claims for the refresh token.
+func (b *RefreshTokenConfig) WithCustomClaims(claims map[string]interface{}) *RefreshTokenConfig {
+	b.customClaims = claims
+	return b
+}
+
+// Build builds the access token configuration.
+func (b *AccessTokenConfig) Build() AccessTokenConfig {
+	return AccessTokenConfig{
+		secretKey:      b.secretKey,
+		standardClaims: b.standardClaims,
+		customClaims:   b.customClaims,
+	}
+}
+
+// Build builds the refresh token configuration.
+func (b *RefreshTokenConfig) Build() RefreshTokenConfig {
+	return RefreshTokenConfig{
+		secretKey:      b.secretKey,
+		standardClaims: b.standardClaims,
+		customClaims:   b.customClaims,
+	}
+}
+
+// WithAccessTokenConfig returns a function that sets the access token configuration using the builder pattern.
+func WithAccessTokenConfig(secretKey []byte, configurators ...func(*AccessTokenConfig)) func(*Auth) {
+	builder, err := NewAccessTokenConfigBuilder(secretKey)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, configurator := range configurators {
+		configurator(builder)
+	}
+
+	return func(a *Auth) {
+		a.AccessConfig = builder.Build()
+	}
+}
+
+// WithRefreshTokenConfig returns a function that sets the refresh token configuration using the builder pattern.
+func WithRefreshTokenConfig(secretKey []byte, configurators ...func(*RefreshTokenConfig)) func(*Auth) {
+	builder, err := NewRefreshTokenConfigBuilder(secretKey)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, configurator := range configurators {
+		configurator(builder)
+	}
+
+	return func(a *Auth) {
+		a.RefreshConfig = builder.Build()
+	}
+}
+
+// NewAuth creates a new Auth instance with the provided access and refresh token configurations.
+func NewAuth(accessConfig AccessTokenConfig, refreshConfig RefreshTokenConfig) *Auth {
+	return &Auth{
+		AccessConfig:  accessConfig,
+		RefreshConfig: refreshConfig,
+	}
+}
+
+// GenerateAccessToken generates a new access token using the configured options.
+func (a *Auth) GenerateAccessToken(signingMethod jwt.SigningMethod) (string, error) {
+	token := jwt.NewWithClaims(signingMethod, a.AccessConfig.standardClaims)
+	return token.SignedString(a.AccessConfig.secretKey.Expose())
+}
+
+// GenerateRefreshToken generates a new refresh token using the configured options.
+func (a *Auth) GenerateRefreshToken(signingMethod jwt.SigningMethod) (string, error) {
+	token := jwt.NewWithClaims(signingMethod, a.RefreshConfig.standardClaims)
+	return token.SignedString(a.RefreshConfig.secretKey.Expose())
+}
+
+// verifyToken verifies a token using the provided signing method and secret key.
+func (a *Auth) verifyToken(tokenString string, signingMethod jwt.SigningMethod, secretKey *m.Secret[[]byte]) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte(a.accessConfig.secret), nil
+		if token.Method != signingMethod {
+			return nil, errors.New("invalid signing method")
+		}
+
+		return secretKey.Expose(), nil
 	})
 	if err != nil {
 		return nil, err
 	}
+
 	return token, nil
 }
 
-// ExtractClaims extracts the claims from a valid token string. This is useful
-// for retrieving user information or other data encoded in the token.
-func (a *Auth) ExtractClaims(tokenString string) (jwt.Claims, error) {
-	token, err := a.ParseToken(tokenString)
-	if err != nil {
-		return nil, err
-	}
-	return token.Claims, nil
+// VerifyAccessToken verifies an access token using the configured options.
+func (a *Auth) VerifyAccessToken(tokenString string, signingMethod jwt.SigningMethod) (*jwt.Token, error) {
+	return a.verifyToken(tokenString, signingMethod, a.AccessConfig.secretKey)
 }
 
-// IsValid checks the validity of the token string. It returns true if the
-// token is valid, false otherwise.
-func (a *Auth) IsValid(tokenString string) bool {
-	claim, err := a.ParseToken(tokenString)
-	if err != nil {
-		return false
-	}
-
-	return claim.Valid
+// VerifyRefreshToken verifies a refresh token using the configured options.
+func (a *Auth) VerifyRefreshToken(tokenString string, signingMethod jwt.SigningMethod) (*jwt.Token, error) {
+	return a.verifyToken(tokenString, signingMethod, a.RefreshConfig.secretKey)
 }
 
-// RefreshToken generates a new access token using the claims from the provided
-// token string. This is useful for extending user sessions without requiring
-// re-authentication.
-func (a *Auth) RefreshToken(tokenString string) (*string, error) {
-	claims, err := a.ExtractClaims(tokenString)
+// RefreshAccessToken refreshes the access token using the configured options.
+func (a *Auth) RefreshAccessToken(tokenString string, signingMethod jwt.SigningMethod) (string, error) {
+	token, err := a.VerifyAccessToken(tokenString, signingMethod)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	// Generate a new access token
-	accessToken, err := a.GenerateToken(claims, tokenTypeAccess)
-	if err != nil {
-		return nil, err
+	_, ok := token.Claims.(*jwt.StandardClaims)
+	if !ok {
+		return "", errors.New("invalid token claims")
 	}
 
-	return accessToken, nil
+	return a.GenerateAccessToken(signingMethod)
+}
+
+// RefreshRefreshToken refreshes the refresh token using the configured options.
+func (a *Auth) RefreshRefreshToken(tokenString string, signingMethod jwt.SigningMethod) (string, error) {
+	token, err := a.VerifyRefreshToken(tokenString, signingMethod)
+	if err != nil {
+		return "", err
+	}
+
+	_, ok := token.Claims.(*jwt.StandardClaims)
+	if !ok {
+		return "", errors.New("invalid token claims")
+	}
+
+	return a.GenerateRefreshToken(signingMethod)
 }
