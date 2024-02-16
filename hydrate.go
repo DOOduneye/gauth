@@ -78,62 +78,62 @@ type Auth struct {
 // TokenConfig defines the configuration for tokens.
 // These include the secret key, standard claims, and custom claims.
 type TokenConfig struct {
-    secretKey      *m.Secret[[]byte] // Secret key used to sign the token
-    standardClaims jwt.StandardClaims // Standard claims for the token
-    customClaims   map[string]interface{} // Custom claims for the token
+	secretKey      *m.Secret[[]byte]      // Secret key used to sign the token
+	standardClaims jwt.StandardClaims     // Standard claims for the token
+	customClaims   map[string]interface{} // Custom claims for the token
 }
 
 // NewTokenConfigBuilder instantiates a new instance of TokenConfig with the provided secret key.
 // If the secret key is nil, an error is returned.
 func NewTokenConfigBuilder(secretKey []byte) (*TokenConfig, error) {
-    if secretKey == nil {
-        return nil, errors.New("secret key is required")
-    }
+	if secretKey == nil {
+		return nil, errors.New("secret key is required")
+	}
 
-    secret, err := m.NewSecret(secretKey)
-    if err != nil {
-        return nil, err
-    }
+	secret, err := m.NewSecret(secretKey)
+	if err != nil {
+		return nil, err
+	}
 
-    return &TokenConfig{
-        secretKey: secret,
-    }, nil
+	return &TokenConfig{
+		secretKey: secret,
+	}, nil
 }
 
 // WithStandardClaims sets the standard claims for the token.
 // Returns the builder instance to allow for method chaining.
 func (b *TokenConfig) WithStandardClaims(claims jwt.StandardClaims) *TokenConfig {
-    b.standardClaims = claims
-    return b
+	b.standardClaims = claims
+	return b
 }
 
 // WithCustomClaims sets the custom claims for the token.
 // Returns the builder instance to allow for method chaining.
 func (b *TokenConfig) WithCustomClaims(claims map[string]interface{}) *TokenConfig {
-    b.customClaims = claims
-    return b
+	b.customClaims = claims
+	return b
 }
 
 // Build builds the token configuration.
 // Returns the built configuration instance.
 func (b *TokenConfig) Build() TokenConfig {
-    return TokenConfig{
-        secretKey:      b.secretKey,
-        standardClaims: b.standardClaims,
-        customClaims:   b.customClaims,
-    }
+	return TokenConfig{
+		secretKey:      b.secretKey,
+		standardClaims: b.standardClaims,
+		customClaims:   b.customClaims,
+	}
 }
 
 // NewAccessTokenConfigBuilder instantiates a new instance of AccessTokenConfig with the provided secret key.
 // If the secret key is nil, an error is returned.
 func NewAccessTokenConfigBuilder(secretKey []byte) (*TokenConfig, error) {
-    return NewTokenConfigBuilder(secretKey)
+	return NewTokenConfigBuilder(secretKey)
 }
 
 // NewRefreshTokenConfigBuilder instantiates a new instance of RefreshTokenConfig with the provided secret key.
 // If the secret key is nil, an error is returned.
 func NewRefreshTokenConfigBuilder(secretKey []byte) (*TokenConfig, error) {
-    return NewTokenConfigBuilder(secretKey)
+	return NewTokenConfigBuilder(secretKey)
 }
 
 // NewAuth creates a new Auth instance with the provided access and refresh token configurations.
@@ -180,44 +180,41 @@ func (a *Auth) GenerateTokenPair(signingMethod jwt.SigningMethod) (*string, *str
 	return accessToken, refreshToken, nil
 }
 
-
 // GenerateAccessToken generates a new access token using the configured options.
 // Will overwrite any custom claims with the provided standard claims.
 // Returns the access token, or an error if one occurs.
 func (a *Auth) GenerateAccessToken(signingMethod jwt.SigningMethod) (*string, error) {
-    combinedClaims := make(jwt.MapClaims)
+	combinedClaims := make(jwt.MapClaims)
 
 	copyCustomClaims(&combinedClaims, a.AccessConfig.customClaims)
 	copyStandardClaims(&combinedClaims, a.AccessConfig.standardClaims)
 
-    token := jwt.NewWithClaims(signingMethod, jwt.MapClaims(combinedClaims))
-    signedToken, err := token.SignedString(a.AccessConfig.secretKey.Expose())
-    if err != nil {
-        return nil, err
-    }
+	token := jwt.NewWithClaims(signingMethod, jwt.MapClaims(combinedClaims))
+	signedToken, err := token.SignedString(a.AccessConfig.secretKey.Expose())
+	if err != nil {
+		return nil, err
+	}
 
-    return &signedToken, nil
+	return &signedToken, nil
 }
-
 
 // GenerateRefreshToken generates a new refresh token using the configured options.
 // Will overwrite any custom claims with the provided standard claims.
 // Returns the refresh token, or an error if one occurs.
 func (a *Auth) GenerateRefreshToken(signingMethod jwt.SigningMethod) (*string, error) {
-    combinedClaims := make(jwt.MapClaims)
+	combinedClaims := make(jwt.MapClaims)
 
-    copyCustomClaims(&combinedClaims, a.RefreshConfig.customClaims)
-    copyStandardClaims(&combinedClaims, a.RefreshConfig.standardClaims)
+	copyCustomClaims(&combinedClaims, a.RefreshConfig.customClaims)
+	copyStandardClaims(&combinedClaims, a.RefreshConfig.standardClaims)
 
-    token := jwt.NewWithClaims(signingMethod, combinedClaims)
-    signedToken, err := token.SignedString(a.RefreshConfig.secretKey.Expose())
-    if err != nil {
-        return nil, err
-    }
+	token := jwt.NewWithClaims(signingMethod, combinedClaims)
+	signedToken, err := token.SignedString(a.RefreshConfig.secretKey.Expose())
+	if err != nil {
+		return nil, err
+	}
 
-    return &signedToken, nil
+	return &signedToken, nil
 }
-
 
 // verifyToken verifies a token using the provided signing method and secret key.
 // Returns the token, or an error if one occurs.
@@ -321,7 +318,7 @@ func copyStandardClaims(claims *jwt.MapClaims, standardClaims jwt.StandardClaims
 // copyCustomClaims copies the custom claims from a map[string]interface{} instance to a jwt.MapClaims instance.
 // It is a utility function used to copy custom claims to the token claims.
 func copyCustomClaims(claims *jwt.MapClaims, customClaims map[string]interface{}) {
-    for key, value := range customClaims {
-        (*claims)[key] = value
-    }
+	for key, value := range customClaims {
+		(*claims)[key] = value
+	}
 }
