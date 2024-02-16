@@ -1,7 +1,63 @@
-// gauth provides a simple, flexible authentication mechanism
+// hydrate provides a simple, flexible authentication mechanism
 // built around JWT (JSON Web Tokens) for Go applications. It supports
 // the generation, verification and refreshing of access and refresh tokens.
-package main
+//
+// Example Usage:
+//
+// import (
+//
+//	"fmt"
+//	"time"
+//
+//	"github.com/golang-jwt/jwt"
+//	"github.com/garrettladley/hydrate"
+//
+//	m "github.com/garrettladley/mattress"
+//
+// )
+//
+//	func main() {
+//	    access, err := hydrate.NewAccessTokenConfigBuilder([]byte("secret"))
+//	    if err != nil {
+//	        fmt.Println(err)
+//	        return
+//	    }
+//
+//	    access.WithStandardClaims(jwt.StandardClaims{
+//	        ExpiresAt: time.Now().Add(1 * time.Hour).Unix(),
+//	        Issuer:    "test",
+//	        Audience:  "test",
+//	    })
+//
+//	    access.WithCustomClaims(map[string]interface{}{
+//	        "role": "admin",
+//	    })
+//
+//	    refresh, err := hydrate.NewRefreshTokenConfigBuilder([]byte("secret"))
+//	    if err != nil {
+//	        fmt.Println(err)
+//	        return
+//	    }
+//
+//	    refresh.WithStandardClaims(jwt.StandardClaims{
+//	        ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
+//	    })
+//
+//	    auth := hydrate.NewAuth(
+//	        hydrate.WithAccessTokenConfig(access),
+//	        hydrate.WithRefreshTokenConfig(refresh),
+//	    )
+//
+//	    accessToken, refreshToken, err := auth.GenerateTokenPair(jwt.SigningMethodHS256)
+//	    if err != nil {
+//	        fmt.Println(err)
+//	        return
+//	    }
+//
+//	    fmt.Println("Access Token:", *accessToken)
+//	    fmt.Println("Refresh Token:", *refreshToken)
+//	}
+package hydrate
 
 import (
 	"errors"

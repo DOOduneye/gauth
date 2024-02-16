@@ -1,4 +1,4 @@
-module github.com/dooduneye/gauth
+module github.com/dooduneye/hydrate
 
 go 1.21.6
 
