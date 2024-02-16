@@ -1,11 +1,10 @@
-# 
+# hydrate
 
 ## A simple JWT authentication utility for Go
 
 [![GAuth Go Report](https://goreportcard.com/badge/github.com/DOOduneye/gauth)](https://goreportcard.com/report/github.com/DOOduneye/gauth)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/license/mit/)
-[![Go.Dev Reference](https://img.shields.io/badge/go.dev-reference-blue?logo=go&logoColor=white)](https://pkg.go.dev/github.com/DOOduneye/gauth)
-
+[![Go.Dev Reference](https://img.shields.io/badge/go.dev-reference-blue?logo=go&logoColor=white)](https://pkg.go.dev/github.com/DOOduneye/hydrate)
 
 ## Table of Contents
 - [Installation](#installation)
@@ -14,7 +13,7 @@
 
 ## Installation
 ```bash
-go get github.com/DOOduneye/gauth
+go get github.com/DOOduneye/hydrate
 ```
 
 ## Features
@@ -34,7 +33,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/DOOduneye/gauth"
+	"github.com/DOOduneye/hydrate"
 )
 
 
