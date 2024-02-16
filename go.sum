@@ -2,8 +2,6 @@ github.com/awnumar/memcall v0.2.0 h1:sRaogqExTOOkkNwO9pzJsL8jrOV29UuUW7teRMfbqtI
 github.com/awnumar/memcall v0.2.0/go.mod h1:S911igBPR9CThzd/hYQQmTc9SWNu3ZHIlCGaWsWsoJo=
 github.com/awnumar/memguard v0.22.4 h1:1PLgKcgGPeExPHL8dCOWGVjIbQUBgJv9OL0F/yE1PqQ=
 github.com/awnumar/memguard v0.22.4/go.mod h1:+APmZGThMBWjnMlKiSM1X7MVpbIVewen2MTkqWkA/zE=
-github.com/garrettladley/mattress v0.3.1 h1:U//SwUtuESlKnCs6FrywbRXAfzqgueH8tIWMZc+s5ZI=
-github.com/garrettladley/mattress v0.3.1/go.mod h1:OWKIRc9wC3gtD3Ng/nUuNEiR1TJvRYLmn/KZYw9nl5Q=
 github.com/garrettladley/mattress v0.3.2 h1:JsWsEwjXzlJXX7F/Zzmq7Xby1VAwzTJGGvf7DXPj4Jk=
 github.com/garrettladley/mattress v0.3.2/go.mod h1:OWKIRc9wC3gtD3Ng/nUuNEiR1TJvRYLmn/KZYw9nl5Q=
 github.com/golang-jwt/jwt v3.2.2+incompatible h1:IfV12K8xAKAnZqdXVzCZ+TOjboZ2keLg81eXfW3O+oY=
