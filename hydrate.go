@@ -261,20 +261,20 @@ func (a *Auth) RefreshAccessToken(tokenString string, signingMethod jwt.SigningM
 	return a.GenerateAccessToken(signingMethod)
 }
 
-// RefreshRefreshToken refreshes the refresh token using the configured options.
-// Returns the new refresh token, or an error if one occurs.
-func (a *Auth) RefreshRefreshToken(tokenString string, signingMethod jwt.SigningMethod) (*string, error) {
-	token, err := a.VerifyRefreshToken(tokenString, signingMethod)
+// ExtractClaims extracts the claims from a token.
+// Returns the claims, or an error if one occurs.
+func (a *Auth) ExtractClaims(tokenString string, signingMethod jwt.SigningMethod, secretKey *m.Secret[[]byte]) (jwt.MapClaims, error) {
+	token, err := a.verifyToken(tokenString, signingMethod, secretKey)
 	if err != nil {
 		return nil, err
 	}
 
-	_, ok := token.Claims.(*jwt.MapClaims)
+	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, errors.New("invalid token claims")
 	}
 
-	return a.GenerateRefreshToken(signingMethod)
+	return claims, nil
 }
 
 // IsValid checks if a token is valid using the provided signing method and secret key.
