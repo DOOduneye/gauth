@@ -4,7 +4,10 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   format:
@@ -27,4 +30,16 @@ jobs:
 
       - name: Run Go formatter
         run: go fmt ./...
+
+      - name: Install gofumpt
+        run: go install mvdan.cc/gofumpt@latest
+
+      - name: Check code formatting
+        run: |
+          unformatted_files=$(gofumpt -l ./)
+          if [ -n "$unformatted_files" ]; then
+            echo "Files not formatted:"
+            echo "$unformatted_files"
+            exit 1
+          fi
 
