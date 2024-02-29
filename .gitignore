@@ -22,3 +22,6 @@ hydrate
 
 # Go workspace file
 go.work
+
+# Apple DS_Store
+.DS_Store
