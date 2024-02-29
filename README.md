@@ -7,15 +7,17 @@
 [![Go.Dev Reference](https://img.shields.io/badge/go.dev-reference-blue?logo=go&logoColor=white)](https://pkg.go.dev/github.com/DOOduneye/hydrate)
 
 ## Installation
+
 ```bash
 go get github.com/DOOduneye/hydrate
 ```
 
 ## Features
+
 - [x] Generate Access and Refresh Tokens
 - [x] Verify Access and Refresh Tokens
 - [x] Set Custom Claims and Standard Claims
+- [x] Testing
 - [ ] Expire Tokens
 - [ ] Middleware for Gin and Echo
 - [ ] Token Blacklisting / Revoking
-- [ ] Testing
