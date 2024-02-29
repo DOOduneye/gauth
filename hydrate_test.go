@@ -359,24 +359,24 @@ func TestParseToken(t *testing.T) {
 		t.Errorf("Unexpected error parsing token: %v", err)
 	}
 
-    if parsedToken != nil {
-        expected := jwt.MapClaims{
-            "iss": "test",
-            "aud": "test",
-        }
+	if parsedToken != nil {
+		expected := jwt.MapClaims{
+			"iss": "test",
+			"aud": "test",
+		}
 
-        same := compareClaims(parsedToken.Claims.(jwt.MapClaims), expected)
+		same := compareClaims(parsedToken.Claims.(jwt.MapClaims), expected)
 
-        if err != nil {
-            t.Errorf("Unexpected error comparing tokens: %v", err)
-        }
+		if err != nil {
+			t.Errorf("Unexpected error comparing tokens: %v", err)
+		}
 
-        if !same {
-            t.Errorf("Expected tokens to be the same")
-        }
-    } else {
-        t.Errorf("parsedToken is nil")
-    }
+		if !same {
+			t.Errorf("Expected tokens to be the same")
+		}
+	} else {
+		t.Errorf("parsedToken is nil")
+	}
 }
 func TestCopyStandardClaims(t *testing.T) {
 	claims := jwt.MapClaims{}

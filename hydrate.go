@@ -191,7 +191,6 @@ func (t *TokenConfig) GenerateToken() ([]byte, error) {
 	return []byte(signedToken), nil
 }
 
-
 // regenerateToken generates a new token using the configured options.
 // Returns the token, or an error if one occurs.
 func (t *TokenConfig) regenerateToken() ([]byte, error) {
