@@ -109,7 +109,6 @@ func TestValidNewToken(t *testing.T) {
 			Audience:  "test",
 		}),
 	)
-
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -150,7 +149,6 @@ func TestMissingExpiresAt(t *testing.T) {
 
 func TestValidGenerateTokenPair(t *testing.T) {
 	accessConfig, refreshConfig, err := setupTokens(t)
-
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -378,6 +376,7 @@ func TestParseToken(t *testing.T) {
 		t.Errorf("parsedToken is nil")
 	}
 }
+
 func TestCopyStandardClaims(t *testing.T) {
 	claims := jwt.MapClaims{}
 	standardClaims := jwt.StandardClaims{

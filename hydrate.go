@@ -317,7 +317,6 @@ func (t *TokenConfig) ParseToken() (*jwt.Token, error) {
 	token, err := jwt.Parse(*t.token, func(token *jwt.Token) (interface{}, error) {
 		return t.secretKey.Expose(), nil
 	})
-
 	if err != nil {
 		return nil, ErrTokenInvalid
 	}
