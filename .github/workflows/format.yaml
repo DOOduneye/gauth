@@ -37,7 +37,7 @@ jobs:
 
       - name: Check code formatting
         run: |
-          unformatted_files=$(gofumpt -l ./backend/)
+          unformatted_files=$(gofumpt -l ./)
           if [ -n "$unformatted_files" ]; then
             echo "Files not formatted:"
             echo "$unformatted_files"
