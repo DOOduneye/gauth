@@ -5,7 +5,7 @@ go 1.21.6
 toolchain go1.22.0
 
 require (
-	github.com/garrettladley/mattress v0.3.2
+	github.com/garrettladley/mattress v0.4.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 )
 
